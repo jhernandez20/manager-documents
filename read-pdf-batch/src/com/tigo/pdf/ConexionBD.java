@@ -23,8 +23,14 @@ public class ConexionBD {
 		PreparedStatement pstmt = null;
 		ResultSet rset = null;
 		boolean found = false;
+		 String url = 
+			     "jdbc:db2://jdbc:db2:desadbfacturaelectronica.database.windows.net:1433/desadbfacturaelectronica" +
+			     ":user=user_fe;password=user_fe;" +
+			     "traceLevel=" +
+			     (com.ibm.db2.jcc.DB2BaseDataSource.TRACE_ALL) + ";";
+			    
 		try {
-			conn = DriverManager .getConnection("jdbc:db2:desadbfacturaelectronica.database.windows.net/desadbfacturaelectronica", "user_fe", "user_fe");
+			conn = DriverManager.getConnection(url);
 			if (conn != null) {
 				System.out.println("DB2 Database Connected");
 			} else {
