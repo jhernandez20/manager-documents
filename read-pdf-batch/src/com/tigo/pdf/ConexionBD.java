@@ -11,6 +11,7 @@ public class ConexionBD {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		try {
+			//git clone https://bitbucket.org/yperez_altiuz/tigotransferenciaxmlsftp/src/master
 			//Class.forName("COM.ibm.db2os390.sqlj.jdbc.DB2SQLJDriver");
 			/** Estado: Fallo:Fallo de la prueba: [jcc][t4][2030][11211][3.59.81] A communication error occurred during operations on the connection's underlying socket, socket input stream, 
 or socket output stream.  Error location: Reply.fill() - insufficient data (-1).  Message: Insufficient data. ERRORCODE=-4499, SQLSTATE=08001**/
