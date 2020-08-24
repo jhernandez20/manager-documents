@@ -21,6 +21,10 @@ import org.apache.commons.net.ftp.FTPFile;
 import org.rauschig.jarchivelib.Archiver;
 import org.rauschig.jarchivelib.ArchiverFactory;
 
+import com.computec.tigofiletransfer.AzureConnection.AzureConnection;
+import com.computec.tigofiletransfer.DBConnection.DBConnection;
+import com.computec.tigofiletransfer.Entities.AzureConnectionnEntity;
+import com.computec.tigofiletransfer.Utilities.Utilities;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 
@@ -28,6 +32,7 @@ import com.itextpdf.text.FontFactory;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.text.pdf.codec.Base64.OutputStream;
 
 public class Busqueda {
 	public static void main(String[] args) throws IOException, DocumentException {
@@ -39,9 +44,10 @@ public class Busqueda {
 		listaPersonas.add(persona);
 		Persona persona2 = new Persona("Leandrito", "940258482");
 		listaPersonas.add(persona2);
-		//System.out.println("La lista tiene : " + listaPersonas.size());
+		// System.out.println("La lista tiene : " + listaPersonas.size());
+		// conectarFtp();
 		conectarFtp();
-		//crearPdf(listaPersonas);
+		// crearPdf(listaPersonas);
 
 		/*
 		 * String info_archivo = leerArchivo(path.toString()); if (info_archivo != null)
@@ -52,10 +58,25 @@ public class Busqueda {
 		// crearTar(path.toString());
 		// crearArchivo(path);
 		// addText(path.toString(),"esta es la primera linea en el fichero.\n");
+		
+		/*
+		 * 
+		 * public static void connectAzureStorage(DBConnection con) {
+		
+		AzureConnection connection = new AzureConnection();
+		connection.conexionAzure(con);
+		
+		AzureConnectionnEntity data = new AzureConnectionnEntity();
+		data = Utilities.getAzureConnectionProp(conn);
+		
+		System.out.println("Conexion Data!"+data);
+	}
+		 * 
+		 * */
 	}
 
 	public static void crearArchivo(Path path) {
-		
+
 		try {
 			Files.createDirectories(path.getParent());
 			Files.createFile(path);
@@ -68,7 +89,7 @@ public class Busqueda {
 	}
 
 	public static void addText(String path, String to_apped) {
-		
+
 		try {
 			PrintWriter writer = new PrintWriter(new FileWriter(path, true));
 			writer.append(to_apped);
@@ -80,7 +101,7 @@ public class Busqueda {
 	}
 
 	public static String leerArchivo(String path) {
-		
+
 		try {
 			FileReader reader = new FileReader(path);
 			BufferedReader buffer = new BufferedReader(reader);
@@ -102,7 +123,7 @@ public class Busqueda {
 	}
 
 	public static void borrarArchivo(String path) {
-		
+
 		File file = new File(path);
 		if (file.exists()) {
 			if (file.delete()) {
@@ -117,7 +138,7 @@ public class Busqueda {
 	}
 
 	public static void descomprirArchivo(String path) {
-		
+
 		File archive = new File(path);
 		File destination = new File("C:\\Users\\jhernandez\\Desktop\\WorkspaceAltiuz\\TIGO\\generate-txt2");
 
@@ -164,45 +185,86 @@ public class Busqueda {
 		documento.add(tabla);
 		documento.close();
 	}
-	
+
 	public static void conectarFtp() {
-		
+
 		FTPClient client = new FTPClient();
 		String sFTP = "ftp.dlptest.com";
 		String sUser = "dlpuser@dlptest.com";
 		String sPassword = "eUj8GeW55SvYaswqUyDSm5v6N";
-				
+
 		try {
-		  client.connect(sFTP);
-		  boolean login = client.login(sUser,sPassword);
-		  //client.changeWorkingDirectory("\\george");
-		  System.out.println("Conectado."+login);
-		 // System.out.println("directorio" +client.printWorkingDirectory());
-		  //FTPFile[] files1 = client.listDirectories();
-		  
-		  FTPFile[] files1 = client.listFiles("/george");
-		  
-		  System.out.println("directorio" +files1);
-		  //InputStream inputStream = ftpClient.retrieveFileStream(remoteFile2);
-          printFileDetails(files1);
-		  client.logout();
-		  client.disconnect();
+			client.connect(sFTP);
+			boolean login = client.login(sUser, sPassword);
+			// client.changeWorkingDirectory("\\george");
+			System.out.println("Conectado." + login);
+			// System.out.println("directorio" +client.printWorkingDirectory());
+			// FTPFile[] files1 = client.listDirectories();
+
+			FTPFile[] files1 = client.listFiles("/george");
+
+			System.out.println("directorio" + files1);
+			// InputStream inputStream = ftpClient.retrieveFileStream(remoteFile2);
+			printFileDetails(files1, client);
+			client.logout();
+			client.disconnect();
 		} catch (IOException e) {
 			System.out.println("error " + e.getMessage());
 		}
 	}
-	
-	private static void printFileDetails(FTPFile[] files) {
-        DateFormat dateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        for (FTPFile file : files) {
-            String details = file.getName();
-            if (file.isDirectory()) {
-                details = "[" + details + "]";
-            }
-            details += "\t\t" + file.getSize();
-            details += "\t\t" + dateFormater.format(file.getTimestamp().getTime());
- 
-            System.out.println(details);
-        }
-    }
+
+	private static void printFileDetails(FTPFile[] files, FTPClient client) {
+		DateFormat dateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		for (FTPFile file : files) {
+			String details = file.getName();
+			if (file.isDirectory()) {
+				details = "[" + details + "]";
+			}
+			details += "\t\t" + file.getSize();
+			details += "\t\t" + dateFormater.format(file.getTimestamp().getTime());
+
+			System.out.println(details);
+		}
+		// boolean status = client.retrieveFile(filename, os);
+	}
+
+	public static void conexionFtp2() {
+
+		String[] filesEntry = { "example.txt", "example2.txt", "example3.txt", "example4.txt", "example10.txt" };
+		String sFTP = "ftp.dlptest.com";
+		String sUser = "dlpuser@dlptest.com";
+		String sPassword = "eUj8GeW55SvYaswqUyDSm5v6N";
+		// ArrayList<String> cars = new ArrayList<String>();
+
+		FTPClient client = new FTPClient();
+		try {
+			client.connect(sFTP);
+			client.login(sUser, sPassword);
+
+			// Download file from FTP server.
+			for (int i = 0; i < filesEntry.length; i++) {
+				
+				FileOutputStream os = new FileOutputStream("C:\\Users\\jhernandez\\Desktop\\WorkspaceAltiuz\\TIGO\\test"+filesEntry[i]);
+
+				boolean status = client.retrieveFile(filesEntry[i], os);
+				System.out.println("status = " + status);
+				System.out.println("reply  = " + client.getReplyString());
+				if (status == false) {
+					// Buscar en Azure
+				}
+
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				client.logout();
+				client.disconnect();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
 }
