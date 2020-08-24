@@ -70,6 +70,7 @@ public class Busqueda {
 		data = Utilities.getAzureConnectionProp(conn);
 		
 		System.out.println("Conexion Data!"+data);
+		https://github.com/Azure/azure-sdk-for-java/blob/master/sdk/storage/azure-storage-blob/src/samples/java/com/azure/storage/blob/BasicExample.java#L38
 	}
 		 * 
 		 * */
